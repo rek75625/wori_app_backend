@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "esnext",
     "module": "nodenext",
@@ -12,7 +12,6 @@
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"],
   
-  // Add this block if ts-node-dev gives execution errors:
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
