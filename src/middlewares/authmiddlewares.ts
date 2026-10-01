@@ -1,5 +1,5 @@
 import { type Request, type Response, type NextFunction } from "express";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken"; // Corrected default import
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
     const token = req.headers.authorization?.split(" ")[1];
@@ -11,8 +11,8 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "worisecretkey");
-        (req as any).user = decoded;
-        next();
+        (req as any).user = decoded; // Correctly attaches decoded data (like user ID) to the request object
+        next(); // Passes execution forward to your actual route logic
     } catch (error) {
         res.status(401).json({ error: "Invalid token" });
     }

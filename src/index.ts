@@ -1,22 +1,22 @@
 import express, { type Request, type Response } from 'express';
-import { json } from 'body-parser';
+import cors from 'cors';
 
-import authroutes from './routes/authroutes.js';
-import conversationsRoutes from './routes/conversationsRoutes.js';
+// Removed the .js extensions so TypeScript resolves files correctly
+import authroutes from './routes/authroutes'
+import conversationsRoutes from './routes/conversationsRoutes';
 
 const app = express();
 
-app.use(json());
+// Always put cors() right at the very top of your middleware stack
+app.use(cors()); 
+app.use(express.json());
 
-// app.get('/', (req: Request, res: Response) => {
-//     res.send('WORI Backend is running successfully!');
-// });
-
+// Main base routes
 app.use('/api/auth', authroutes);
 app.use('/api/conversations', conversationsRoutes);
 
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log(`Server listening at ${PORT} port`);
+    console.log(`Server listening at port ${PORT}`);
 });
