@@ -10,39 +10,39 @@ import { Server } from 'socket.io';
 import { createMessage } from './controllers/messagesController';
 
 const app = express()
-const server =  http.createServer(app);
+const server = http.createServer(app);
 
-const io = new Server(server,{
-    cors:{
-        origin:'*'
+const io = new Server(server, {
+    cors: {
+        origin: '*'
     }
 })
 
 
 // Always put cors() right at the very top of your middleware stack
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
 /// Socket.io event handling
-io.on('connection',(socket)=>{
-    console.log('a user connected',socket.id);
-    socket.on('join_room',(conversationId)=>{
+io.on('connection', (socket) => {
+    console.log('a user connected', socket.id);
+    socket.on('join_room', (conversationId) => {
         socket.join(conversationId);
         console.log(`User ${socket.id} joined room ${conversationId}`);
 
     });
-    socket.on('send_message', async (message)=>{
-        const {conversationId,senderId,content} = message;
-        try{
-        const createdmessage = await createMessage(conversationId,senderId,content);
-        console.log('Message created:', createdmessage);
-        io.to(conversationId).emit('receive_message',createdmessage);
-        }catch(error){
+    socket.on('send_message', async (message) => {
+        const { conversationId, senderId, content } = message;
+        try {
+            const createdmessage = await createMessage(conversationId, senderId, content);
+            console.log('Message created:', createdmessage);
+            io.to(conversationId).emit('receive_message', createdmessage);
+        } catch (error) {
             console.error('Error creating message:', error);
         }
     });
-    socket.on('disconnect',()=>{
-        console.log('user disconnected',socket.id);
+    socket.on('disconnect', () => {
+        console.log('user disconnected', socket.id);
     });
 });
 
