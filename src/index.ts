@@ -7,7 +7,9 @@ import authroutes from './routes/authroutes';
 import conversationsRoutes from './routes/conversationsRoutes';
 import messageRoutes from './routes/messageRoutes';
 
-import { createMessage } from './controllers/messagesController';
+import { createMessages } from './controllers/messagesController';
+import { fetchContacts } from './controllers/contactController';
+import contactsRoute from './routes/contactsRoute';
 
 const app = express();
 
@@ -41,16 +43,21 @@ io.on('connection', (socket) => {
     const { conversationId, senderId, content } = message;
 
     try {
-        const createdMessage = await createMessage(
+        const createdMessage = await createMessages(
             conversationId,
             senderId,
             content
         );
-
+      console.log("Message created:", createdMessage);
         io.to(conversationId).emit(
             'receive_message',
             createdMessage
         );
+        io.emit('conversationUpdates', {
+            conversationId,
+            lastMessage: createdMessage.content,
+            lastMessageTime: createdMessage.created_at,
+        });
     } catch (error) {
         console.error('Error creating message:', error);
     }
@@ -68,6 +75,7 @@ io.on('connection', (socket) => {
 app.use('/api/auth', authroutes);
 app.use('/api/conversations', conversationsRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/contacts', contactsRoute);
 
 const PORT = process.env.PORT || 5000;
 

@@ -23,7 +23,7 @@ export const getAllMessagesByConversationId = async (req: Request, res: Response
 
 }
 
-export const createMessage = async (conversationId: string, senderId: number, content: string): Promise<void> => {
+export const createMessages = async (conversationId: string, senderId: number, content: string): Promise<any> => {
      try {
         const result = await pool.query(
             `
