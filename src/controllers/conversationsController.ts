@@ -48,3 +48,42 @@ export const getConversationsById = async (
     res.status(500).json({ error: "failed to fetch conversation" });
   }
 };
+
+export const checkOrCreateConversation = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<any> => {
+  const userId = req.user?.id ?? null;
+  const { contactId } = req.body;
+
+  try {
+    const existingConversation = await pool.query(
+      `
+        SELECT id from conversations
+        Where (participant_one = $1 AND participant_two = $2)
+            OR (participant_two = $1 AND participant_one = $2) 
+        LIMIT 1;
+        `,
+      [userId, contactId],
+    );
+    if (
+      existingConversation.rowCount != null &&
+      existingConversation.rowCount! > 0
+    ) {
+      return res.json({ conversationId: existingConversation.rows[0].id });
+    }
+
+    const newConversation = await pool.query(
+      `
+      INSERT INTO conversations (participant_one,participant_two)
+      VALUES ($1,$2)
+      RETURNING id;
+      `,
+      [userId, contactId],
+    );
+    res.json({ conversationId: newConversation.rows[0].id });
+  } catch (e) {
+    console.error("Error Checking or Creating Conversations", e);
+    res.status(500).json({ e: "Failed to check or create coversation" });
+  }
+};
