@@ -9,6 +9,7 @@ import messageRoutes from "./routes/messageRoutes";
 
 import { createMessages } from "./controllers/messagesController";
 import contactsRoute from "./routes/contactsRoute";
+import "dotenv/config";
 
 const app = express();
 
