@@ -8,7 +8,6 @@ import conversationsRoutes from "./routes/conversationsRoutes";
 import messageRoutes from "./routes/messageRoutes";
 
 import { createMessages } from "./controllers/messagesController";
-import { fetchContacts } from "./controllers/contactController";
 import contactsRoute from "./routes/contactsRoute";
 
 const app = express();

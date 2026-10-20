@@ -1,5 +1,6 @@
 import { type Request, type Response } from "express";
 import pool from "../models/db.js";
+import { AI_BOT_ID } from "../services/config.js";
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -85,5 +86,35 @@ export const checkOrCreateConversation = async (
   } catch (e) {
     console.error("Error Checking or Creating Conversations", e);
     res.status(500).json({ e: "Failed to check or create coversation" });
+  }
+};
+
+export const getDailyQuestions = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<any> => {
+  const conversationId = req.params.id;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT content FROM messages
+      WHERE conversation_id = $1 
+        AND sender_id = $2 
+      ORDER BY created_at DESC
+      LIMIT 1
+      `,
+      [conversationId, AI_BOT_ID], // Uses your clean config variable imported on line 3
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ e: "No daily questions found" });
+    }
+
+    // Safely reads the row array structure index
+    res.json({ question: result.rows[0].content });
+  } catch (e) {
+    console.error("Error Fetching daily qustions", e);
+    res.status(500).json({ e: "Failed to fetch daily questions" });
   }
 };
