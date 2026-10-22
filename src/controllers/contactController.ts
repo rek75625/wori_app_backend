@@ -165,21 +165,27 @@ export const recentContact = async (
   try {
     const result = await pool.query(
       `
-     SELECT u.id AS contact_id , u.username, u.email, u.profile_image
-     FROM contacts c
-     JOIN users u ON u.id = c.contact.id
-     WHERE c.user_id = $1
-     ORDER BY c.created_at DESC
-     LIMIT 8
-    `,
+      SELECT
+          u.id AS contact_id,
+          u.username,
+          u.email,
+          u.profile_image
+      FROM contacts c
+      JOIN users u
+          ON u.id = c.contact_id
+      WHERE c.user_id = $1
+      ORDER BY c.created_at DESC
+      LIMIT 8
+      `,
       [userId],
     );
-    res.status(200).json(result.rows);
+
+    return res.status(200).json(result.rows);
   } catch (error: unknown) {
     console.error("Fetching contact backend execution failed:", error);
 
     return res.status(500).json({
-      error: "Failed to Fetching contact due to server error",
+      error: "Failed to fetch contacts due to server error",
     });
   }
 };
